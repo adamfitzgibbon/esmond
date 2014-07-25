@@ -1,0 +1,4 @@
+To setup the environment:
+	scl enable python27 bash
+	source /opt/esmond/esmond.env
+
