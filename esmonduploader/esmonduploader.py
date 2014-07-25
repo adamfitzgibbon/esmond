@@ -6,7 +6,7 @@ filters = ApiFilters()
 
 class FilterArgs(object):
 	
-	def __init__(self,verbose=True,start=-3600,end=0,source='198.129.254.30',tool_name='bwcrtl/iperf3',connect='http://hcc-pki-ps02.unl.edu:8000',username='afitz',key='fc077a6a133b22618172bbb50a1d3104a23b2050'):
+	def __init__(self,verbose=True,start=-3600,end=0,source='198.129.254.30',tool_name='bwctl/iperf3',connect='http://hcc-pki-ps02.unl.edu:8000',username='afitz',key='fc077a6a133b22618172bbb50a1d3104a23b2050'):
 	
 		filters.verbose = verbose
 		filters.time_start = time.time() + start
@@ -16,7 +16,8 @@ class FilterArgs(object):
 		self.connect = connect
 		self.username = username
 		self.key = key
-
+	
+	# Establish connection
 	def apiConn(self):
 		conn = ApiConnect(self.connect,filters)
 		
@@ -25,11 +26,20 @@ class FilterArgs(object):
 		
 		else:
 			return conn
-	
+
+	# Get Data
 	def getData(self,conn):
 		for md in conn.get_metadata():
 			print md
+			print md.destination
+			print md.ip_packet_interval
+			for et in md.get_all_event_types():
+				print et.event_type
+		
+		now = time.strftime("%c")
+		print now
 
+	# Post Data
 	def postData(self):
 		args = {
 			"subject_type": "point-to-point",
