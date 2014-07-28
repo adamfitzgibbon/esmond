@@ -4,7 +4,10 @@ import time
 from optparse import OptionParser
 
 filters = ApiFilters()
+
 parser = OptionParser()
+parser.add_option('-b', help='boolean option', dest='bool', default=False, action='store_true')
+(opts, args) = parser.parse_args()
 
 class EsmondUploader(object):
 	
@@ -25,45 +28,65 @@ class EsmondUploader(object):
 
 		
 		# Metadata variables
-		self.destination = ''
-		self.input_destination = ''
-		self.input_source = ''
-		self.measurement_agent = ''
-		self.sample_bucket_width = ''
-		self.source = ''
-		self.subject_type = ''
-		self.time_duration = ''
-		self.tool_name = ''
+		self.destination = []
+		self.input_destination = []
+		self.input_source = []
+		self.measurement_agent = []
+		self.sample_bucket_width = []
+		self.source = []
+		self.subject_type = []
+		self.time_duration = []
+		self.tool_name = []
+		self.event_types = []
+		self.summaries = []
 
 	# Get Data
 	def getData(self):
 		for md in self.conn.get_metadata():
-			# Assigning each meta data object property to class variables
-			self.destination = md.destination
-			self.input_destination = md.destination
-			self.input_source = md.input_source
-			self.measurement_agent = md.measurement_agent
-			self.sample_bucket_width = md.sample_bucket_width
-			self.source = md.source
-			self.subject_type = md.subject_type
-			self.time_duration = md.time_duration
-			self.tool_name = md.tool_name
-			
+			# Assigning each metadata object property to class variables
+			self.destination.append(md.destination)
+			self.input_destination.append(md.input_destination)
+			self.input_source.append(md.input_source)
+			self.measurement_agent.append(md.measurement_agent)
+			self.sample_bucket_width.append(md.sample_bucket_width)
+			self.source.append(md.source)
+			self.subject_type.append(md.subject_type)
+			self.time_duration.append(md.time_duration)
+			self.tool_name.append(md.tool_name)
+			self.event_types.append(md.event_types)
+			print md.dump
+			# Get Events and Data Payload
+			temp_list = [] 
+			for et in md.get_all_event_types():
+				temp_list.append(et.summaries)
+			self.summaries.append(temp_list)
+
+
 	# Post Data
 	def postData(self):
-		args = {
-			"subject_type": self.subject_type,
-			"source": self.source,
-			"destination": self.destination,
-			"tool_name": self.tool_name,
-			"measurement_agent": self.measurement_agent,
-			"input_source": self.connect,
-			"input_destination": self.goc,
-			"time_duration": self.time_duration,
-			# "ip_transport_protocol": "tcp"
-		}
-	
-		mp = MetadataPost(self.goc,username=self.username, api_key=self.key, **args)			
+		for i in range(len(self.destination)):
+			# Looping through metadata
+			args = {
+				"subject_type": self.subject_type[i],
+				"source": self.source[i],
+				"destination": self.destination[i],
+				"tool_name": self.tool_name[i],
+				"measurement_agent": self.measurement_agent[i],
+				"input_source": self.connect[i],
+				"input_destination": self.goc[i],
+				"time_duration": self.time_duration[i],
+				# "ip_transport_protocol": "tcp"
+			}
 		
+			mp = MetadataPost(self.goc,username=self.username, api_key=self.key, **args)			
+			
+			# Posting Event Types and Summaries
+			for event_type in self.event_types[i]:
+				mp.add_event_type(event_type)
+				for summary in self.summaries[i]:
+					if summary:
+						mp.add_summary_type(event_type, summary[0], summary[1]) 
+			
+			new_meta = mp.post_metadata()	
 
-		new_meta = mp.post_metadata()	
+			et = EventTypePost(self.goc, username=self.username, api_key=self.key, metadata_key=new_meta.metadata_key, event_type='throughput')
