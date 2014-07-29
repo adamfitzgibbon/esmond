@@ -67,6 +67,7 @@ class EsmondUploader(object):
 				temp_list2.append(tup)
 			self.datapoint.append(temp_list2)
 			self.summaries.append(temp_list)
+
 	# Post Data
 	def postData(self):
 		for i in range(len(self.destination)):
@@ -85,17 +86,13 @@ class EsmondUploader(object):
 		
 			mp = MetadataPost(self.goc,username=self.username, api_key=self.key, **args)			
 			# Posting Event Types and Summaries
-			for event_type in self.event_types[i]:
+			for event_type, summary in zip(self.event_types[i], self.summaries[i]):
 				mp.add_event_type(event_type)
-				for summary in self.summaries[i]:
-					if summary:
-						mp.add_summary_type(event_type, summary[0][0], summary[0][1]) 
-			new_meta = mp.post_metadata()	
-			print new_meta
+				if summary:
+					mp.add_summary_type(event_type, summary[0][0], summary[0][1])
+			new_meta = mp.post_metadata()
 			# Posting Data Points	
 			for event_type in range(len(self.event_types[i])):
 				et = EventTypePost(self.goc, username=self.username, api_key=self.key, metadata_key=new_meta.metadata_key, event_type=self.event_types[event_type])
 				et.add_data_point(self.datapoint[i][event_type][0],self.datapoint[i][event_type][1])
-				print self.datapoint[i][event_type][0]
-				print self.datapoint[i][event_type][1]
 				et.post_data()
