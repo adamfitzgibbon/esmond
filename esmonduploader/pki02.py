@@ -4,4 +4,4 @@ caller = EsmondUploader(verbose=False,start=-3600,end=0,connect='http://hcc-pki-
 
 caller.getData()
 
-#caller.postData()
+caller.postData()
