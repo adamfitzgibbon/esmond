@@ -1,7 +1,14 @@
 from esmonduploader import *
+from time import sleep
 
-caller = EsmondUploader(verbose=False,start=-3600,end=0,connect='http://hcc-pki-ps02.unl.edu')
+### File that would call EsmondUploader() with specified parameters to get and post the data ###
 
-caller.getData()
+caller = EsmondUploader(verbose=False,start=-43200,end=0,connect='http://hcc-pki-ps02.unl.edu')
+	
+while True:
 
-caller.postData()
+	caller.getData()
+
+	caller.postData()
+	
+	sleep(43200)

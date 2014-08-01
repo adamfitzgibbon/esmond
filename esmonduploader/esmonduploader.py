@@ -70,6 +70,23 @@ class EsmondUploader(object):
 
 	# Post Data
 	def postData(self):
+		
+		# Functions to convert from Unicode
+		def convert(input):
+	    		if isinstance(input, dict):
+				return {convert(key): convert(value) for key, value in input.iteritems()}
+	    		elif isinstance(input, list):
+				return [convert(element) for element in input]
+	    		elif isinstance(input, unicode):
+				return input.encode('utf-8')
+	    		else:
+				return input
+		def unUnicode(l):
+			for i in range(len(l)):
+				l[i] = convert(l[i])
+			return l
+
+
 		for i in range(len(self.destination)):
 			# Looping through metadata
 			args = {
@@ -92,7 +109,12 @@ class EsmondUploader(object):
 					mp.add_summary_type(event_type, summary[0][0], summary[0][1])
 			new_meta = mp.post_metadata()
 			# Posting Data Points	
-			for event_type in range(len(self.event_types[i])):
-				et = EventTypePost(self.goc, username=self.username, api_key=self.key, metadata_key=new_meta.metadata_key, event_type=self.event_types[event_type])
-				et.add_data_point(self.datapoint[i][event_type][0],self.datapoint[i][event_type][1])
+			for event_num in range(len(self.event_types[i])):
+				### Histograms were being rejected (wants dict, not list of dicts) disregarding them for now ###
+				#val = unUnicode(self.datapoint[i][event_num][1]) # Convert from Unicode in case of Histogram
+				if isinstance(self.datapoint[i][event_num][1], list):
+					if isinstance(self.datapoint[i][event_num][1][0], dict):
+						continue
+				et = EventTypePost(self.goc, username=self.username, api_key=self.key, metadata_key=new_meta.metadata_key, event_type=self.event_types[i][event_num])
+				et.add_data_point(self.datapoint[i][event_num][0],self.datapoint[i][event_num][1])
 				et.post_data()
