@@ -11,20 +11,22 @@ parser.add_option('-b', help='boolean option', dest='bool', default=False, actio
 
 class EsmondUploader(object):
 	
-	def __init__(self,verbose=True,start=-3600,end=0,connect='http://hcc-pki-ps02.unl.edu',username='afitz',key='fc077a6a133b22618172bbb50a1d3104a23b2050'):
+	def __init__(self,verbose=True,start=-43200,end=0,delay=43200,connect='http://hcc-pki-ps02.unl.edu',username='afitz',key='fc077a6a133b22618172bbb50a1d3104a23b2050'):
 		
+
 		# Filter variables
 		filters.verbose = verbose
 		filters.time_start = time.time() + start
 		filters.time_end = time.time() + end
 		
 		
-		# Username/Key/Location
+		# Username/Key/Location/Delay
 		self.connect = connect
 		self.username = username
 		self.key = key
 		self.goc = 'http://osgnetds.grid.iu.edu'
 		self.conn = ApiConnect(self.connect,filters)
+		self.delay = delay
 
 		
 		# Metadata variables
