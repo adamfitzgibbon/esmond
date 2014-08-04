@@ -1,4 +1,16 @@
 To setup the environment:
-	scl enable python27 bash
-	source /opt/esmond/esmond.env
+	$ scl enable python27 bash
+	$ source /opt/esmond/esmond.env
+
+Then navigate to /esmond/esmonduploader and type:
+	$ python caller.py -h 
+or
+	$ python caller.py --help
+to view the other options.
+
+Enter:
+	$ python caller.py -p
+or
+	$ python caller.py --post
+to initiate the data get/post program with the specified options.
 

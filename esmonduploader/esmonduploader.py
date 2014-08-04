@@ -3,10 +3,17 @@ from esmond.api.client.perfsonar.post import MetadataPost, EventTypePost, EventT
 import time
 from optparse import OptionParser
 
+# Set filter object
 filters = ApiFilters()
 
+# Set command line options
 parser = OptionParser()
-parser.add_option('-b', help='boolean option', dest='bool', default=False, action='store_true')
+parser.add_option('-d', '--disp', help='display metadata from specified url', dest='disp', default=False, action='store_true')
+parser.add_option('-e', '--end', help='set end time for gathering data (default is now)', dest='end', default=0)
+parser.add_option('-p', '--post',  help='begin get/post loop from specified url', dest='post', default=False, action='store_true')
+parser.add_option('-s', '--start', help='set start time for gathering data (default is -12 hours)', dest='start', default=-43200)
+parser.add_option('-u', '--url', help='set url to gather data from (default is http://hcc-pki-ps02.unl.edu)', dest='url', default='http://hcc-pki-ps02.unl.edu')
+parser.add_option('-y', '--delay', help='set delay for gathering data (default is 12 hours)', dest='delay', default=43200)
 (opts, args) = parser.parse_args()
 
 class EsmondUploader(object):
@@ -18,7 +25,6 @@ class EsmondUploader(object):
 		filters.verbose = verbose
 		filters.time_start = time.time() + start
 		filters.time_end = time.time() + end
-		
 		
 		# Username/Key/Location/Delay
 		self.connect = connect
@@ -42,34 +48,56 @@ class EsmondUploader(object):
 		self.event_types = []
 		self.summaries = []
 		self.datapoint = []
+		self.metadata_key = []
 
 	# Get Data
-	def getData(self):
+	def getData(self,disp=False):
 		for md in self.conn.get_metadata():
-			# Assigning each metadata object property to class variables
-			self.destination.append(md.destination)
-			self.input_destination.append(md.input_destination)
-			self.input_source.append(md.input_source)
-			self.measurement_agent.append(md.measurement_agent)
-			self.sample_bucket_width.append(md.sample_bucket_width)
-			self.source.append(md.source)
-			self.subject_type.append(md.subject_type)
-			self.time_duration.append(md.time_duration)
-			self.tool_name.append(md.tool_name)
-			self.event_types.append(md.event_types)
-			
-			# Get Events and Data Payload
-			temp_list = [] 
-			temp_list2 = []
-			for et in md.get_all_event_types():
-				temp_list.append(et.summaries)
-				dpay = et.get_data()
-				for dp in dpay.data:
-					tup = (dp.ts_epoch,dp.val)
-				temp_list2.append(tup)
-			self.datapoint.append(temp_list2)
-			self.summaries.append(temp_list)
-
+			# Check for repeat data
+			if md.metadata_key in self.metadata_key:
+				pos = self.metadata_key.index(md.metadata_key)
+				print pos
+				del self.destination[pos]
+                                del self.input_destination[pos]
+				del self.source[pos]
+				del self.measurement_agent[pos]
+                                del self.input_source[pos]
+                                del self.time_duration[pos]
+                                del self.tool_name[pos]
+                                del self.subject_type[pos]
+                                del self.tool_name[pos]
+                                del self.event_types[pos]
+                                del self.summaries[pos]
+                                del self.datapoint[pos]
+                                del self.metadata_key[pos]
+			else:			
+				# Assigning each metadata object property to class variables
+				self.destination.append(md.destination)
+				self.input_destination.append(md.input_destination)
+				self.input_source.append(md.input_source)
+				self.measurement_agent.append(md.measurement_agent)
+				self.sample_bucket_width.append(md.sample_bucket_width)
+				self.source.append(md.source)
+				self.subject_type.append(md.subject_type)
+				self.time_duration.append(md.time_duration)
+				self.tool_name.append(md.tool_name)
+				self.event_types.append(md.event_types)
+				self.metadata_key.append(md.metadata_key)
+				# Display all metadata if asked
+				if disp:
+					print md.dump
+				# Get Events and Data Payload
+				temp_list = [] 
+				temp_list2 = []
+				for et in md.get_all_event_types():
+					temp_list.append(et.summaries)
+					dpay = et.get_data()
+					for dp in dpay.data:
+						tup = (dp.ts_epoch,dp.val)
+					temp_list2.append(tup)
+				self.datapoint.append(temp_list2)
+				self.summaries.append(temp_list)
+			print self.metadata_key
 	# Post Data
 	def postData(self):
 		
