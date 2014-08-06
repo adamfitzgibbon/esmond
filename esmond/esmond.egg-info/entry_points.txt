@@ -1,0 +1,10 @@
+[console_scripts]
+esdbd = esmond.newdb:esdb_standalone
+esfetch = esmond.fetch:esfetch
+esmanage = esmond.manage:esmanage
+espersistd = esmond.persist:espersistd
+espersistq = esmond.persist:espersistq
+espoll = esmond.poll:espoll
+espolld = esmond.poll:espolld
+gen_ma_storefile = esmond.perfsonar:gen_ma_storefile
+

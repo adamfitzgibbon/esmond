@@ -1,0 +1,10 @@
+#!/opt/esmond/bin/python
+# EASY-INSTALL-ENTRY-SCRIPT: 'esmond==0.9b1','console_scripts','espoll'
+__requires__ = 'esmond==0.9b1'
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.exit(
+        load_entry_point('esmond==0.9b1', 'console_scripts', 'espoll')()
+    )

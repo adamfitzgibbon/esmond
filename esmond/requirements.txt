@@ -1,0 +1,4 @@
+sphinx
+django-discover-runner
+-e hg+https://bitbucket.org/jdugan/dlnetsnmp#egg=DLNetSNMP
+-e .

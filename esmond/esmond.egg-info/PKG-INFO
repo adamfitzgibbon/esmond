@@ -1,0 +1,20 @@
+Metadata-Version: 1.1
+Name: esmond
+Version: 0.9b1
+Summary: ESnet Monitoring Daemon
+Home-page: http://software.es.net/esmond/
+Author: Jon M. Dugan
+Author-email: jdugan@es.net
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Telecommunications Industry
+Classifier: Environment :: Console
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python :: 2
+Classifier: Topic :: Internet
+Classifier: Topic :: System :: Networking
+Classifier: Topic :: Software Development :: Libraries

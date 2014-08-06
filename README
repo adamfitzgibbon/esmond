@@ -1,6 +1,6 @@
 To setup the environment:
 	$ scl enable python27 bash
-	$ source /opt/esmond/esmond.env
+	$ source /esmond/esmond.env
 
 Then navigate to /esmond/esmonduploader and type:
 	$ python caller.py -h 

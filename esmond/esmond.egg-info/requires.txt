@@ -1,0 +1,10 @@
+Django==1.5.1
+django-tastypie
+web.py
+python-memcached
+pycassa
+psycopg2
+python-mimeparse
+requests
+mock
+nagiosplugin
