@@ -5,6 +5,7 @@ from optparse import OptionParser
 
 # Set filter object
 filters = ApiFilters()
+gfilters = ApiFilters()
 
 # Set command line options
 parser = OptionParser()
@@ -25,15 +26,20 @@ class EsmondUploader(object):
 		filters.verbose = verbose
 		filters.time_start = time.time() + start
 		filters.time_end = time.time() + end
-		
+		gfilters.verbose = False		
+		gfilters.time_start = time.time() - 43200
+		gfilters.time_end = time.time()
+
+
 		# Username/Key/Location/Delay
 		self.connect = connect
 		self.username = username
 		self.key = key
 		self.goc = 'http://osgnetds.grid.iu.edu'
 		self.conn = ApiConnect(self.connect,filters)
+		self.gconn = ApiConnect(self.goc,gfilters)
 		self.delay = delay
-
+				
 		
 		# Metadata variables
 		self.destination = []
@@ -49,14 +55,20 @@ class EsmondUploader(object):
 		self.summaries = []
 		self.datapoint = []
 		self.metadata_key = []
-
+		self.old_list = []
+	
+	#Get goc Data
+	def getGoc(self):
+		for gmd in self.gconn.get_metadata():
+			print gmd.dump
+	
 	# Get Data
 	def getData(self,disp=False):
 		for md in self.conn.get_metadata():
 			# Check for repeat data
 			if md.metadata_key in self.metadata_key:
+				# Deletes old data from lists
 				pos = self.metadata_key.index(md.metadata_key)
-				print pos
 				del self.destination[pos]
                                 del self.input_destination[pos]
 				del self.source[pos]
@@ -65,11 +77,14 @@ class EsmondUploader(object):
                                 del self.time_duration[pos]
                                 del self.tool_name[pos]
                                 del self.subject_type[pos]
-                                del self.tool_name[pos]
                                 del self.event_types[pos]
                                 del self.summaries[pos]
                                 del self.datapoint[pos]
                                 del self.metadata_key[pos]
+				self.old_list.append(md.metadata_key)
+			elif md.metadata_key in self.old_list:
+				# Prevents saving old data
+				continue
 			else:			
 				# Assigning each metadata object property to class variables
 				self.destination.append(md.destination)
@@ -97,7 +112,6 @@ class EsmondUploader(object):
 					temp_list2.append(tup)
 				self.datapoint.append(temp_list2)
 				self.summaries.append(temp_list)
-			print self.metadata_key
 	# Post Data
 	def postData(self):
 		
@@ -145,6 +159,10 @@ class EsmondUploader(object):
 				if isinstance(self.datapoint[i][event_num][1], list):
 					if isinstance(self.datapoint[i][event_num][1][0], dict):
 						continue
+				if isinstance(self.datapoint[i][event_num][1], dict):
+					continue
 				et = EventTypePost(self.goc, username=self.username, api_key=self.key, metadata_key=new_meta.metadata_key, event_type=self.event_types[i][event_num])
 				et.add_data_point(self.datapoint[i][event_num][0],self.datapoint[i][event_num][1])
+				print self.datapoint[i][event_num][0], self.datapoint[i][event_num][1]
+				
 				et.post_data()

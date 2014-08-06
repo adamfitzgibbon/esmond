@@ -4,7 +4,7 @@ from time import sleep
 ### File that would call EsmondUploader() with specified parameters to get and post the data ###
 
 caller = EsmondUploader(verbose=False,start=opts.start,end=opts.end,delay=opts.delay,connect=opts.url)
-
+#caller.getGoc()
 if opts.disp:
 	caller.getData(opts.disp)
 if opts.post:
@@ -17,4 +17,4 @@ if opts.post:
 		caller.postData()
 		
 		print "Waiting %s seconds..." % caller.delay
-		sleep(caller.delay)
+		sleep(float(caller.delay))
