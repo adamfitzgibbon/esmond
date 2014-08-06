@@ -2,11 +2,13 @@ from esmonduploader import *
 from time import sleep
 
 ### File that would call EsmondUploader() with specified parameters to get and post the data ###
+caller = EsmondUploader(verbose=False,start=int(opts.start),end=int(opts.end),delay=int(opts.delay),connect=opts.url)
 
-caller = EsmondUploader(verbose=False,start=opts.start,end=opts.end,delay=opts.delay,connect=opts.url)
-#caller.getGoc()
+# Option: Display Metadata
 if opts.disp:
 	caller.getData(opts.disp)
+
+# Option: Get and Post Metadata
 if opts.post:
 	while True:
 		

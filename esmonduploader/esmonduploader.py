@@ -60,30 +60,15 @@ class EsmondUploader(object):
 	#Get goc Data
 	def getGoc(self):
 		for gmd in self.gconn.get_metadata():
-			print gmd.dump
-	
+			self.old_list.append(gmd.metadata_key)
+			
+
 	# Get Data
 	def getData(self,disp=False):
+		self.getGoc()
 		for md in self.conn.get_metadata():
 			# Check for repeat data
-			if md.metadata_key in self.metadata_key:
-				# Deletes old data from lists
-				pos = self.metadata_key.index(md.metadata_key)
-				del self.destination[pos]
-                                del self.input_destination[pos]
-				del self.source[pos]
-				del self.measurement_agent[pos]
-                                del self.input_source[pos]
-                                del self.time_duration[pos]
-                                del self.tool_name[pos]
-                                del self.subject_type[pos]
-                                del self.event_types[pos]
-                                del self.summaries[pos]
-                                del self.datapoint[pos]
-                                del self.metadata_key[pos]
-				self.old_list.append(md.metadata_key)
-			elif md.metadata_key in self.old_list:
-				# Prevents saving old data
+			if md.metadata_key in self.old_list:
 				continue
 			else:			
 				# Assigning each metadata object property to class variables
@@ -155,7 +140,6 @@ class EsmondUploader(object):
 			# Posting Data Points	
 			for event_num in range(len(self.event_types[i])):
 				### Histograms were being rejected (wants dict, not list of dicts) disregarding them for now ###
-				#val = unUnicode(self.datapoint[i][event_num][1]) # Convert from Unicode in case of Histogram
 				if isinstance(self.datapoint[i][event_num][1], list):
 					if isinstance(self.datapoint[i][event_num][1][0], dict):
 						continue
@@ -163,6 +147,19 @@ class EsmondUploader(object):
 					continue
 				et = EventTypePost(self.goc, username=self.username, api_key=self.key, metadata_key=new_meta.metadata_key, event_type=self.event_types[i][event_num])
 				et.add_data_point(self.datapoint[i][event_num][0],self.datapoint[i][event_num][1])
-				print self.datapoint[i][event_num][0], self.datapoint[i][event_num][1]
 				
 				et.post_data()
+		# Wipe lists (emptied for looping get/post)
+		del self.destination[:]
+                del self.input_destination[:]
+                del self.source[:]
+                del self.measurement_agent[:]
+                del self.input_source[:]
+                del self.time_duration[:]
+                del self.tool_name[:]
+                del self.subject_type[:]
+                del self.event_types[:]
+                del self.summaries[:]
+                del self.datapoint[:]
+                del self.metadata_key[:]
+		del self.old_list[:]
