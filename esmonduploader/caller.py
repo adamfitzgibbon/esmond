@@ -3,8 +3,8 @@ import sys
 from esmonduploader import *
 
 ### File that would call EsmondUploader() with specified parameters to get and post the data ###
-caller = EsmondUploader(verbose=False,start=int(opts.start),
-        end=int(opts.end),delay=int(opts.delay),connect=opts.url)
+caller = EsmondUploader(verbose=False,start=int(opts.start),end=int(opts.end),connect=opts.url)
+
 # Option: Display Metadata
 if opts.disp:
     try:
@@ -14,23 +14,20 @@ if opts.disp:
 
 # Option: Get and Post Metadata
 if opts.post:
-    while True:
         
-        print "Getting data..."
-        try:
-            caller.getData()
-        except Exception as err:
-            print "Error! Get unsuccessful! Exception: \"%s\" of type: \"%s\" was thrown! Quitting out." % (err,type(err))
-            break
-        else:
-            print "Get successful!"
+    print "Getting data..."
+    try:
+        caller.getData()
+    except Exception as err:
+        print "Error! Get unsuccessful! Exception: \"%s\" of type: \"%s\" was thrown! Quitting out." % (err,type(err))
+    else:
+        print "Get successful!"
         print "Posting data..."
         try:
             caller.postData()
         except Exception as err:
             print "Error! Post unsuccessful! Exception: \"%s\" of type: \"%s\" was thrown! Quitting out." % (err,type(err))
-            break
+            sys.exit(1)
         else:
             print "Post successful!"
-        print "Waiting %s seconds..." % caller.delay
-        sleep(float(caller.delay))
+            sys.exit(0)

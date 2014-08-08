@@ -15,13 +15,12 @@ parser.add_option('-e', '--end', help='set end time for gathering data (default 
 parser.add_option('-p', '--post',  help='begin get/post loop from specified url', dest='post', default=False, action='store_true')
 parser.add_option('-s', '--start', help='set start time for gathering data (default is -12 hours)', dest='start', default=-43200)
 parser.add_option('-u', '--url', help='set url to gather data from (default is http://hcc-pki-ps02.unl.edu)', dest='url', default='http://hcc-pki-ps02.unl.edu')
-parser.add_option('-y', '--delay', help='set delay for gathering data (default is 12 hours)', dest='delay', default=43200)
 (opts, args) = parser.parse_args()
 
 
 class EsmondUploader(object):
     
-    def __init__(self,verbose,start,end,delay,connect,username='afitz',key='fc077a6a133b22618172bbb50a1d3104a23b2050'):
+    def __init__(self,verbose,start,end,connect,username='afitz',key='fc077a6a133b22618172bbb50a1d3104a23b2050'):
 
         # Filter variables
         filters.verbose = verbose
@@ -38,7 +37,6 @@ class EsmondUploader(object):
         self.goc = 'http://osgnetds.grid.iu.edu'
         self.conn = ApiConnect(self.connect,filters)
         self.gconn = ApiConnect(self.goc,gfilters)
-        self.delay = delay
                 
         # Metadata variables
         self.destination = []
@@ -54,21 +52,15 @@ class EsmondUploader(object):
         self.datapoint = []
         self.metadata_key = []
         self.old_list = []
-        self.old_timestamp = []
    
     # Get Existing GOC Data
     def getGoc(self):
         for gmd in self.gconn.get_metadata():
             self.old_list.append(gmd.metadata_key)
-            for get in gmd.get_all_event_types():
-                gdpay = get.get_data()
-                for gdp in gdpay.data:
-                    self.old_timestamp.append(gdp.ts_epoch)           
-                    print self.old_timestamp
+    
     # Get Data
     def getData(self,disp=False):
         self.getGoc()
-        old_time_max = max(self.old_timestamp)
         i = 0
         for md in self.conn.get_metadata():
             # Check for repeat data
@@ -86,9 +78,8 @@ class EsmondUploader(object):
                 self.tool_name.append(md.tool_name)
                 self.event_types.append(md.event_types)
                 self.metadata_key.append(md.metadata_key)
-                # Display all metadata when -d or --disp option is used
                 if disp:
-                    print "NEW METADATA/DATA #" + str(i+1) + "\n\n"
+                    print "\n\nNEW METADATA/DATA #" + str(i+1) + "\n"
                     print "Destination: " + self.destination[i]
                     print "Input Destination: " + self.input_destination[i]
                     print "Input Source: " + self.input_source[i]
@@ -113,7 +104,7 @@ class EsmondUploader(object):
                 # Print out summaries and datapoints if -d or --disp option is used
                 if disp:
                     print "Summaries: " + str(self.summaries[i])
-                    print "Datapoints: " + str(self.datapoint[i]) + "\n\n"
+                    print "Datapoints: " + str(self.datapoint[i])
             i += 1
     # Post Data
     def postData(self):
@@ -160,5 +151,7 @@ class EsmondUploader(object):
         del self.subject_type[:]
         del self.event_types[:]
         del self.summaries[:]
+        del self.datapoint[:]
+        del self.metadata_key[:]
         del self.datapoint[:]
         del self.metadata_key[:]

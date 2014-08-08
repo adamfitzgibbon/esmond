@@ -18,9 +18,9 @@ If you would just like to run the get/post script under default settings, enter:
 or
     $ python caller.py --post
 
-An example of setting the script to get/post data every six hours with a window 
+An example of setting the script to get/post data with a window 
 of a day before-hand to present time from the perfsonar url "hcc-pki-ps01.unl.edu":
-    $ python caller.py --start -86400 --end 0 --delay 21600 --url hcc-pki-ps01.unl.edu --post
+    $ python caller.py --start -86400 --end 0 --url hcc-pki-ps01.unl.edu --post
 
 The --start -86400 option tells the script to look for data no older than 86400 seconds
 (3600 seconds/hour * 24 hours in a day) or a day old.
@@ -28,9 +28,6 @@ The --start -86400 option tells the script to look for data no older than 86400 
 The --end 0 option tells the script to look for data no younger than 0 seconds old, or
 basically any data younger than the --start argument up until the script runs (0 is the default
 for --end so this option could be left out).
-
-The --delay 21600 option simply tells the script to wait 21600 seconds (3600 seconds/hour * 6 hours)
-6 hours before querying for more data.
 
 The --url hcc-pki-ps01.unl.edu option specifies which url to query data from, in this case the 
 node "hcc-pki-ps01.unl.edu".
@@ -40,4 +37,4 @@ or all fields are not given, it will use the default options.
 
 In addition, the less verbose option of each option may be used to use caller.py quicker, and 
 any options that are the same as the default can be left off. The example above could be written as:
-    $ python caller.py -s -86400 -y 21600 -u hcc-pki-ps01.unl.edu -p
+    $ python caller.py -s -86400 -u hcc-pki-ps01.unl.edu -p
