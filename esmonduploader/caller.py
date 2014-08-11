@@ -31,3 +31,8 @@ if opts.post:
         else:
             print "Post successful!"
             sys.exit(0)
+
+# Option: Error Checking (Get/Post without error catching)
+if opts.err:
+    caller.getData()
+    caller.postData()

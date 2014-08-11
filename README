@@ -3,38 +3,44 @@ To setup the environment:
     $ source esmond/esmond.env
 
 Then navigate to /esmond/esmonduploader. Inside this folder is the file, 
-esmonduploader.py, for the class that handles getting and posting the data 
-from the nodes. The other file, caller.py, creates and instance of the class
-and takes command line options that can alter the default settings of 
-the script, such as what host to connect to, the window of time for the age 
-of the data that is alowed to be collected, etc. To see a full list of options, 
-how to use them, and what their default argument is, type:
+esmonduploader.py, for the class that handles getting and posting the 
+data from the nodes. The other file, caller.py, creates and instance of 
+the class and takes command line options that can alter the default 
+settings of the script, such as what host to connect to, the window of 
+time for the age of the data that is alowed to be collected, etc. To see 
+a full list of options, how to use them, and what their default argument 
+is, type:
     $ python caller.py -h 
 or
     $ python caller.py --help
 
-If you would just like to run the get/post script under default settings, enter:
+If you would just like to run the get/post script under default settings, 
+enter:
     $ python caller.py -p
 or
     $ python caller.py --post
 
 An example of setting the script to get/post data with a window 
-of a day before-hand to present time from the perfsonar url "hcc-pki-ps01.unl.edu":
+of a day before-hand to present time from the perfsonar url 
+"http://hcc-pki-ps01.unl.edu":
     $ python caller.py --start -86400 --end 0 --url hcc-pki-ps01.unl.edu --post
 
-The --start -86400 option tells the script to look for data no older than 86400 seconds
-(3600 seconds/hour * 24 hours in a day) or a day old.
+The --start -86400 option tells the script to look for data no older than 
+86400 seconds (3600 seconds/hour * 24 hours in a day) or a day old.
 
-The --end 0 option tells the script to look for data no younger than 0 seconds old, or
-basically any data younger than the --start argument up until the script runs (0 is the default
-for --end so this option could be left out).
+The --end 0 option tells the script to look for data no younger than 0 
+seconds old, or basically any data younger than the --start argument up until 
+the script runs (0 is the default for --end so this option could be left out).
 
-The --url hcc-pki-ps01.unl.edu option specifies which url to query data from, in this case the 
-node "hcc-pki-ps01.unl.edu".
+The --url http://hcc-pki-ps01.unl.edu option specifies which url to query data 
+from, in this case the node "http://hcc-pki-ps01.unl.edu". 
+NOTE: DON'T FORGET THE HTTP
 
-The --post option tells the script to run with the options it has been given. If options to some 
-or all fields are not given, it will use the default options.
+The --post option tells the script to run with the options it has been given. 
+If options to some or all fields are not given, it will use the 
+default options.
 
-In addition, the less verbose option of each option may be used to use caller.py quicker, and 
-any options that are the same as the default can be left off. The example above could be written as:
+In addition, the less verbose option of each option may be used to use 
+caller.py quicker, and any options that are the same as the default can be 
+left off. The example above could be written as:
     $ python caller.py -s -86400 -u hcc-pki-ps01.unl.edu -p

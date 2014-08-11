@@ -12,7 +12,8 @@ gfilters = ApiFilters()
 parser = OptionParser()
 parser.add_option('-d', '--disp', help='display metadata from specified url', dest='disp', default=False, action='store_true')
 parser.add_option('-e', '--end', help='set end time for gathering data (default is now)', dest='end', default=0)
-parser.add_option('-p', '--post',  help='begin get/post loop from specified url', dest='post', default=False, action='store_true')
+parser.add_option('-p', '--post',  help='begin get/post from specified url', dest='post', default=False, action='store_true')
+parser.add_option('-r', '--error', help='run get/post without error handling (for debugging)', dest='err', default=False, action='store_true')
 parser.add_option('-s', '--start', help='set start time for gathering data (default is -12 hours)', dest='start', default=-43200)
 parser.add_option('-u', '--url', help='set url to gather data from (default is http://hcc-pki-ps02.unl.edu)', dest='url', default='http://hcc-pki-ps02.unl.edu')
 (opts, args) = parser.parse_args()
@@ -57,7 +58,7 @@ class EsmondUploader(object):
     def getGoc(self):
         for gmd in self.gconn.get_metadata():
             self.old_list.append(gmd.metadata_key)
-    
+   
     # Get Data
     def getData(self,disp=False):
         self.getGoc()
@@ -93,13 +94,15 @@ class EsmondUploader(object):
                 # Get Events and Data Payload
                 temp_list = [] 
                 temp_list2 = []
+                temp_list3 = []
                 for et in md.get_all_event_types():
                     temp_list.append(et.summaries)
                     dpay = et.get_data()
                     for dp in dpay.data:
                         tup = (dp.ts_epoch,dp.val)
                         temp_list2.append(tup)
-                self.datapoint.append(temp_list2)
+                    temp_list3.append(temp_list2)
+                self.datapoint.append(temp_list3)
                 self.summaries.append(temp_list)
                 # Print out summaries and datapoints if -d or --disp option is used
                 if disp:
@@ -117,7 +120,7 @@ class EsmondUploader(object):
                 "tool_name": self.tool_name[i],
                 "measurement_agent": self.measurement_agent[i],
                 "input_source": self.connect[i],
-                "input_destination": self.goc[i],
+                "input_destination": self.goc,
                 "time_duration": self.time_duration[i],
             }
         
@@ -130,28 +133,13 @@ class EsmondUploader(object):
             new_meta = mp.post_metadata()
             # Posting Data Points
             for event_num in range(len(self.event_types[i])):
+                for datapoint in self.datapoint[i][event_num]:
                 ### Histograms were being rejected (wants dict, not list of dicts) disregarding them for now ###
-                if isinstance(self.datapoint[i][event_num][1], list):
-                    if isinstance(self.datapoint[i][event_num][1][0], dict):
+                    if isinstance(datapoint[1], list):
+                        if isinstance(datapoint[1][0], dict):
+                            continue
+                    if isinstance(datapoint[1], dict):
                         continue
-                if isinstance(self.datapoint[i][event_num][1], dict):
-                    continue
-                et = EventTypePost(self.goc, username=self.username, api_key=self.key, metadata_key=new_meta.metadata_key, event_type=self.event_types[i][event_num])
-                et.add_data_point(self.datapoint[i][event_num][0],self.datapoint[i][event_num][1])
-                et.post_data()
-       
-        # Wipe lists (emptied for looping get/post)
-        del self.destination[:]
-        del self.input_destination[:]
-        del self.source[:]
-        del self.measurement_agent[:]
-        del self.input_source[:]
-        del self.time_duration[:]
-        del self.tool_name[:]
-        del self.subject_type[:]
-        del self.event_types[:]
-        del self.summaries[:]
-        del self.datapoint[:]
-        del self.metadata_key[:]
-        del self.datapoint[:]
-        del self.metadata_key[:]
+                    et = EventTypePost(self.goc, username=self.username, api_key=self.key, metadata_key=new_meta.metadata_key, event_type=self.event_types[i][event_num])
+                    et.add_data_point(datapoint[0],datapoint[1])
+                    et.post_data()
