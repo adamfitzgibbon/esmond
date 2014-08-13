@@ -5,16 +5,7 @@ from esmonduploader import *
 ### File that would call EsmondUploader() with specified parameters to get and post the data ###
 caller = EsmondUploader(verbose=False,start=int(opts.start),end=int(opts.end),connect=opts.url)
 
-# Option: Display Metadata
-if opts.disp:
-    try:
-        caller.getData(opts.disp)
-    except Exception as err:
-        print "An error occurred! Exception:  \"%s\" of type: \"%s\" was thrown!" % (err, type(err))
-
-# Option: Get and Post Metadata
-if opts.post:
-        
+def get_post():
     print "Getting data..."
     try:
         caller.getData()
@@ -32,6 +23,25 @@ if opts.post:
             print "Post successful!"
             sys.exit(0)
 
+
+# Option: Display Metadata
+if opts.disp:
+    try:
+        caller.getData(opts.disp)
+    except Exception as err:
+        print "An error occurred! Exception:  \"%s\" of type: \"%s\" was thrown!" % (err, type(err))
+
+# Option: Get and Post Metadata
+if opts.post:
+    # Option: Loop Process (Repeat every 12 hours)
+    if opts.loop:    
+        while True:
+            get_post()
+            print "Waiting 43200 seconds (12 hours)"
+            sleep(43200)
+    # Else do once and quit out
+    else:
+        get_post()
 # Option: Error Checking (Get/Post without error catching)
 if opts.err:
     caller.getData()

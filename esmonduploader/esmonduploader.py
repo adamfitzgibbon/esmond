@@ -12,6 +12,7 @@ gfilters = ApiFilters()
 parser = OptionParser()
 parser.add_option('-d', '--disp', help='display metadata from specified url', dest='disp', default=False, action='store_true')
 parser.add_option('-e', '--end', help='set end time for gathering data (default is now)', dest='end', default=0)
+parser.add_option('-l', '--loop', help='include this option for looping process', dest='loop', default=False, action='store_true')
 parser.add_option('-p', '--post',  help='begin get/post from specified url', dest='post', default=False, action='store_true')
 parser.add_option('-r', '--error', help='run get/post without error handling (for debugging)', dest='err', default=False, action='store_true')
 parser.add_option('-s', '--start', help='set start time for gathering data (default is -12 hours)', dest='start', default=-43200)
@@ -119,7 +120,7 @@ class EsmondUploader(object):
                 "destination": self.destination[i],
                 "tool_name": self.tool_name[i],
                 "measurement_agent": self.measurement_agent[i],
-                "input_source": self.connect[i],
+                "input_source": self.connect,
                 "input_destination": self.goc,
                 "time_duration": self.time_duration[i],
             }
